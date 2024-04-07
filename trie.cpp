@@ -11,7 +11,7 @@ class Node {
     int end;
 
     Node() {
-        memset(ref, NULL, sizeof(ref));
+        memset(ref, 0, sizeof(ref));
         prefix = 0;
         end = 0;
     }
@@ -99,6 +99,19 @@ class Trie {
         }
 
         return temp->getPrefix();
+    }
+
+    bool isPrefix(string &s) {
+        Node* temp = root;
+
+        for(auto &ch: s) {
+            if(!temp->contains(ch)) {
+                return false;
+            }
+            temp = temp->get(ch);
+        }
+
+        return true;
     }
 
     void erase(string &s) {
