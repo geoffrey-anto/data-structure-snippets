@@ -1,25 +1,32 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-vector<vector<int>> merge(vector<vector<int>>& arr) {
-    sort(begin(arr), end(arr));
+template <typename T> void print(T arr) {
+  for (auto i : arr) {
+    cout << i << ' ';
+  }
+  cout << endl;
+}
 
-    vector<vector<int>> ans;
+vector<vector<int>> merge(vector<vector<int>> &arr) {
+  sort(begin(arr), end(arr));
 
-    int n = arr.size();
+  vector<vector<int>> ans;
 
-    for(int i=0; i<n; i++) {
-        if(ans.empty() or ans.back()[1] < arr[i][0]) {
-            ans.push_back(arr[i]);
-        } else if(ans.back()[1] >= arr[i][0]) {
-            vector<int> b = ans.back();
-            ans.pop_back();
+  int n = arr.size();
 
-            int right = max(b[1], arr[i][1]);
+  for (int i = 0; i < n; i++) {
+    if (ans.empty() or ans.back()[1] < arr[i][0]) {
+      ans.push_back(arr[i]);
+    } else if (ans.back()[1] >= arr[i][0]) {
+      vector<int> b = ans.back();
+      ans.pop_back();
 
-            ans.push_back({b[0], right});
-        } 
+      int right = max(b[1], arr[i][1]);
+
+      ans.push_back({b[0], right});
     }
+  }
 
-    return ans;
+  return ans;
 }
