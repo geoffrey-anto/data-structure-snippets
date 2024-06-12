@@ -1,52 +1,60 @@
 #include <bits/stdc++.h>
+#include <functional>
 using namespace std;
 
-int seg[4 * (int)1e5];
+class SegTree {
+public:
+  int seg[4 * (int)1e5];
+  function<int(int, int)> updateFunc;
 
-void build(int i, int l, int h, vector<int> &arr,
-           function<int(int, int)> update) {
-  if (l == h) {
-    seg[i] = arr[l];
-    return;
+  SegTree(function<int(int, int)> u) {
+    memset(seg, 0, sizeof(seg));
+    this->updateFunc = u;
   }
 
-  int mid = l + (h - l) / 2;
+  void build(int i, int l, int h, vector<int> &arr) {
+    if (l == h) {
+      seg[i] = arr[l];
+      return;
+    }
 
-  build(2 * i + 1, l, mid, arr, update);
-  build(2 * i + 2, mid + 1, h, arr, update);
+    int mid = l + (h - l) / 2;
 
-  seg[i] = update(seg[2 * i + 1], seg[2 * i + 2]);
-}
+    build(2 * i + 1, l, mid, arr);
+    build(2 * i + 2, mid + 1, h, arr);
 
-int query(int i, int l, int h, int ql, int qh, function<int(int, int)> update,
-          int base = 0) {
-  if (l > qh || h < ql) {
-    return base;
+    seg[i] = updateFunc(seg[2 * i + 1], seg[2 * i + 2]);
   }
 
-  if (l >= ql && h <= qh) {
-    return seg[i];
+  int query(int i, int l, int h, int ql, int qh, int base = 0) {
+    if (l > qh || h < ql) {
+      return base;
+    }
+
+    if (l >= ql && h <= qh) {
+      return seg[i];
+    }
+
+    int mid = l + (h - l) / 2;
+
+    return updateFunc(query(2 * i + 1, l, mid, ql, qh, base),
+                      query(2 * i + 2, mid + 1, h, ql, qh, base));
   }
 
-  int mid = l + (h - l) / 2;
+  void update(int i, int l, int h, int idx, int val) {
+    if (l == h) {
+      seg[i] = val;
+      return;
+    }
 
-  return update(query(2 * i + 1, l, mid, ql, qh, update, base),
-                query(2 * i + 2, mid + 1, h, ql, qh, update, base));
-}
+    int mid = l + (h - l) / 2;
 
-void update(int i, int l, int h, int idx, int val, function<int(int, int)> up) {
-  if (l == h) {
-    seg[i] = val;
-    return;
+    if (idx <= mid) {
+      update(2 * i + 1, l, mid, idx, val);
+    } else {
+      update(2 * i + 2, mid + 1, h, idx, val);
+    }
+
+    seg[i] = updateFunc(seg[2 * i + 1], seg[2 * i + 2]);
   }
-
-  int mid = l + (h - l) / 2;
-
-  if (idx <= mid) {
-    update(2 * i + 1, l, mid, idx, val, up);
-  } else {
-    update(2 * i + 2, mid + 1, h, idx, val, up);
-  }
-
-  seg[i] = up(seg[2 * i + 1], seg[2 * i + 2]);
-}
+};
