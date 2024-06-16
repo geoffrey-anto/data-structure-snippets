@@ -5,10 +5,12 @@ using namespace std;
 class SegTree {
 public:
   int seg[4 * (int)1e5];
+  int lazy[4 * (int)1e5];
   function<int(int, int)> updateFunc;
 
   SegTree(function<int(int, int)> u) {
     memset(seg, 0, sizeof(seg));
+    memset(lazy, 0, sizeof(lazy));
     this->updateFunc = u;
   }
 
@@ -56,5 +58,67 @@ public:
     }
 
     seg[i] = updateFunc(seg[2 * i + 1], seg[2 * i + 2]);
+  }
+
+  void rangeUpdate(int i, int low, int high, int l, int r, int val) {
+    if (lazy[i] != 0) {
+      seg[i] += (high - low + 1) * lazy[i];
+
+      if (low != high) {
+        lazy[2 * i + 1] += lazy[i];
+        lazy[2 * i + 2] += lazy[i];
+      }
+
+      lazy[i] = 0;
+    }
+
+    if (r < low || l > high || low > high) {
+      return;
+    }
+
+    if (l <= low && r >= high) {
+      seg[i] += (high - low + 1) * val;
+
+      if (low != high) {
+        lazy[2 * i + 1] += val;
+        lazy[2 * i + 2] += val;
+      }
+
+      return;
+    }
+
+    int mid = low + (high - low) / 2;
+
+    rangeUpdate(2 * i + 1, low, mid, l, r, val);
+    rangeUpdate(2 * i + 2, mid + 1, high, l, r, val);
+    seg[i] = updateFunc(seg[2 * i + 1], seg[2 * i + 2]);
+  }
+
+  int queryLazy(int i, int low, int high, int l, int r, int val, int base = 0) {
+    if (lazy[i] != 0) {
+      seg[i] += (high - low + 1) * lazy[i];
+
+      if (low != high) {
+        lazy[2 * i + 1] += lazy[i];
+        lazy[2 * i + 2] += lazy[i];
+      }
+
+      lazy[i] = 0;
+    }
+
+    if (r < low || l > high || low > high) {
+      return base;
+    }
+
+    if (l <= low && r >= high) {
+      return seg[i];
+    }
+
+    int mid = low + (high - low) / 2;
+
+    int lq = queryLazy(2 * i + 1, low, mid, l, r, val, base);
+    int rq = queryLazy(2 * i + 2, mid + 1, high, l, r, val, base);
+
+    return updateFunc(lq, rq);
   }
 };
