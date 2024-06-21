@@ -4,26 +4,27 @@ using namespace std;
 
 class SegTree {
 public:
-  int seg[4 * (int)1e5];
-  int lazy[4 * (int)1e5];
+  vector<int> seg, lazy;
   function<int(int, int)> updateFunc;
+  int n = 0;
 
-  SegTree(function<int(int, int)> u) {
-    memset(seg, 0, sizeof(seg));
-    memset(lazy, 0, sizeof(lazy));
+  SegTree(function<int(int, int)> u, int n) {
+    seg = vector<int>(4 * n, 0);
+    lazy = vector<int>(4 * n, 0);
+    this->n = n;
     this->updateFunc = u;
   }
 
-  void build(int i, int l, int h, vector<int> &arr) {
+  void build(int i, int l, int h, int val) {
     if (l == h) {
-      seg[i] = arr[l];
+      seg[i] = val;
       return;
     }
 
     int mid = l + (h - l) / 2;
 
-    build(2 * i + 1, l, mid, arr);
-    build(2 * i + 2, mid + 1, h, arr);
+    build(2 * i + 1, l, mid, val);
+    build(2 * i + 2, mid + 1, h, val);
 
     seg[i] = updateFunc(seg[2 * i + 1], seg[2 * i + 2]);
   }
