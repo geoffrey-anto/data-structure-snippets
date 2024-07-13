@@ -15,16 +15,16 @@ public:
     this->updateFunc = u;
   }
 
-  void build(int i, int l, int h, int val) {
+  void build(const vector<int>& arr, int i, int l, int h) {
     if (l == h) {
-      seg[i] = val;
+      seg[i] = arr[l];
       return;
     }
 
     int mid = l + (h - l) / 2;
 
-    build(2 * i + 1, l, mid, val);
-    build(2 * i + 2, mid + 1, h, val);
+    build(arr, 2 * i + 1, l, mid);
+    build(arr, 2 * i + 2, mid + 1, h);
 
     seg[i] = updateFunc(seg[2 * i + 1], seg[2 * i + 2]);
   }
